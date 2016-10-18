@@ -1,0 +1,10 @@
+Tasarım Konusu : Poligon Otomasyon Sistemi
+
+Tasarım İçeriği : Tasarımımzda 'shot','shooter', 'field', 'gun type' ve 'gun' isimli 5 adet varlık sınıfı vardır. Shooter sınıfımızda atışı yapacak olan varlıkların isim, id, kimlik bilgisi, iletişim bilgileri gibi özellikler saklanır. Gun sınıfımızda elimizde bulunan silahların id, isim, seri numarası, bakım bilgileri ve bu sınıfın supervisorı olan gun type sınıfının primary keyi foreign key olarak saklanır. Gun type sınıfımızda silah tiplerinin id, isim, ücret -ücretlendirme silah tipleri üzerinden yapılır-, mühimmat yüzdesi -silah tiplerine göre mühimmat sayımı yapılır- ve silah tiplerinin kullanılabileceği alanları belirten field sınıfımızın id leri foreign key olarak saklanır. Field sınıfımızda sahanın id, isim, doluluk tablosu, bulunan atış platformu sayısı, atış yapılacak maximum uzaklık ve bakım bilgisi saklanır. Bu oluşturduğumuz sınıflardan alınan atış sahası idsi, atıcı idsi ve kimlik bilgisi, silah idsi özellikleri foreign key olarak ve gerçek dünyadan alınan platform numarası, zaman bilgisi ve atış başarı yüzdesi özellikleri  ile shot varlık sınıfını oluşturduk.
+
+
+Soru 1 : Atış başarısı 75 ten düşük olanların kullandığı silah tiplerinin mühimmat yüzdesini ve ismini getirin.
+Cevap 1 : select gt.nm, gt.ammo_precentage from gun_type gt, shot s, gun g where s.success_percentage<75 and g.id = s.gun_id and gt.id = g.gun_type_id;
+
+Soru 2 : Atış uzaklığı 100 den küçük eşit olan sahalarda atış yapabilen silahların seri numarası ve isimlerini getirin.
+Cevap 2 : select gun.serial_number, gun.nm from gun, field, gun_type where gun_type.id = gun.gun_type_id and field.max_range <= 100 and field.id = gun_type.field_id;
