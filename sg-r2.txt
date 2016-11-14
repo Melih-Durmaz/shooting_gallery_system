@@ -1,0 +1,33 @@
+1-a)mühimmatı %50 den düşük olan silah tiplerinin isimlerini barındıran view hazırlayın.
+	create view lessAmmoGunType as select nm from gun_type where ammo_precentage<50;
+
+1-b)insert into gun_type values(6, 'explosive', 100.0, 3, 25.0);
+	insert into gun_type values(7, 'cannon', 150.0, 3, 30.0);
+
+1-c)select * from lessAmmoGunType;
+
+2)	7 veya 0 id'li silahlarla atış yapanların ssn değeri ve ssn değeri 5'ten küçük olan veya 
+iletişim bilgisinde 'USA' yazan atıcıların ssn değerinin kesişim kümesini bulun.
+
+	(select shooter_ssn from shot where gun_id=0
+	union
+	select shooter_ssn from shot where gun_id=7)
+	
+	intersect
+	
+	(select ssn from shooter where ssn<5
+	union
+	select ssn from shooter where communication_info like 'USA%');
+
+3)	'rifle' silah tipinde olmayan tüm silahların isimlerini seçin.
+	select g.nm from gun g where 
+	not exists (select null from gun_type gt 	
+	where gt.nm='rifle' and gt.id=g.gun_type_id);
+
+4-a&b) atışlar tablosundaki atış başarısı sütununu baz alın.
+	select MIN(success_percentage) minsucper, MAX(success_percentage) maxsucper,
+	AVG(success_percentage) avgsucper from shot;
+
+5)	atış tablosunda atış yapılan platformlara göre sıralayıp grup elemanları 3'ten az olanların platform numarasını seçin.
+	select platform_num from shot group by platform_num having COUNT(platform_num)<3;
+	
