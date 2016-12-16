@@ -32,12 +32,12 @@ class GUI(QApplication):
         newShooterLayout = QFormLayout()
 
         SSN = QLineEdit()
-        #SSN.setMask('9999999999')
+        SSN.setInputMask('9999999999')
         nameSurname = QLineEdit()
         birthDate = QLineEdit()
-        #birthDate.setMask('99/99/9999')
+        birthDate.setInputMask('99/99/9999')
         communication = QLineEdit()
-        #communication.setMask('+99_9999_999_9999')
+        communication.setInputMask('+99_9999_999_9999')
 
         newShooterLayout.addRow('SSN : ', SSN)
         newShooterLayout.addRow('Name Surname : ', nameSurname)

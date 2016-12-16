@@ -1,11 +1,11 @@
 ﻿--shooter views
-create view shooter_ob_name as select * from shooter where id>-1 order by name_surname;
-create view shooter_ob_success as select * from shooter where id>-1 order by shot_success;
-create view shooter_ob_id as select * from shooter where id>-1 order by id;
-create view shooters_not_member as select * from shooter where id=-1;
+create view shooter_ob_name as select * from shooter where member=true order by name_surname;
+create view shooter_ob_success as select * from shooter where member=true order by shot_success;
+create view shooter_all_ob_member as select * from shooter where member=true order by member;
+create view shooter_not_member as select * from shooter where member=false;
 
 --shooters for combo box
-create view shooter_combo as select id, ssn, name_surname from shooter where id>-1;
+create view shooter_combo as select ssn, name_surname from shooter where member=true;
 
 --field views
 create view field_ob_name as select * from field order by nm;
@@ -32,19 +32,19 @@ create view gun_ob_name as select g.id, g.serial_number, g.nm as gnm, gt.nm as g
 create view gun_combo as select * from gun;
 
 --shot views
-create view shot_ob_shooter_id as select sr.name_surname, g.nm as gnm, f.nm as fnm, s.success_percentage, s.start_date, s.stop_date 
+create view shot_ob_shooter_ssn as select sr.name_surname, g.nm as gnm, f.nm as fnm, s.success_percentage, s.start_date, s.stop_date 
 	from field f, gun g, shooter sr, shot s 
-	where s.shooter_id>-1 and s.shooter_id=sr.id and s.shooter_ssn = sr.ssn
-	and s.gun_id = g.id and s.field_id = f.id order by s.shooter_id;
+	where sr.member=true and s.shooter_ssn = sr.ssn
+	and s.gun_id = g.id and s.field_id = f.id order by s.shooter_ssn;
 create view shot_ob_start_date as select sr.name_surname, g.nm as gnm, f.nm as fnm, s.success_percentage, s.start_date, s.stop_date 
 	from field f, gun g, shooter sr, shot s 
-	where s.shooter_id>-1 and s.shooter_id=sr.id and s.shooter_ssn = sr.ssn
+	where sr.member=true and s.shooter_ssn = sr.ssn
 	and s.gun_id = g.id and s.field_id = f.id order by s.start_date;
 create view shot_ob_success_percentage as select sr.name_surname, g.nm as gnm, f.nm as fnm, s.success_percentage, s.start_date, s.stop_date 
 	from field f, gun g, shooter sr, shot s 
-	where s.shooter_id>-1 and s.shooter_id=sr.id and s.shooter_ssn = sr.ssn
+	where sr.member=true and s.shooter_ssn = sr.ssn
 	and s.gun_id = g.id and s.field_id = f.id order by s.success_percentage;
 create view shot_by_not_member as select sr.name_surname, g.nm as gnm, f.nm as fnm, s.success_percentage, s.start_date, s.stop_date 
 	from field f, gun g, shooter sr, shot s 
-	where s.shooter_id=-1 and s.shooter_id=sr.id and s.shooter_ssn = sr.ssn
+	where sr.member=false and s.shooter_ssn = sr.ssn
 	and s.gun_id = g.id and s.field_id = f.id ;

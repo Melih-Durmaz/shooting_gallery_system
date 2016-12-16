@@ -1,13 +1,12 @@
 ﻿--drop table shooter;
 create table shooter (
-id int default -1,
-ssn numeric(10) not null,
+ssn numeric(10) primary key,
+member boolean default false,
 birth_date date not null,
 name_surname varchar(50) not null,
 communication_info varchar(100) not null,
 shot_success float default 0,
-shot_count int default 0,
-primary key (id, ssn)
+shot_count int default 0
 );
 
 --drop table field;
@@ -59,14 +58,13 @@ foreign key (gun_type_id) references gun_type
 
 --drop table shot;
 create table shot (
-shooter_id int,
 shooter_ssn numeric(10),
 gun_id int not null,
 field_id int not null,
 success_percentage int not null,
 start_date timestamp not null,
 stop_date timestamp not null,
-foreign key (shooter_id, shooter_ssn) references shooter
+foreign key (shooter_ssn) references shooter
     on delete set null,
 foreign key (gun_id) references gun,
 foreign key (field_id) references field

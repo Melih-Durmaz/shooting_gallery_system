@@ -7,11 +7,11 @@ end;
 $$ language plpgsql;
 
 --selecting shots shooter id given
-create or replace function get_shots_from_shooter(si shot.shooter_id%type, ss shot.shooter_ssn%type)
+create or replace function get_shots_from_shooter(ss shot.shooter_ssn%type)
 	returns table(gun_id int, field_id int, success_percentage int, start_date timestamp, stop_date timestamp) as $$
 begin
 	return query select gun_id, field_id, success_percentage, start_date, stop_date from shot
-	where shooter_id=si and shooter_ssn=ss;
+	where shooter_ssn=ss;
 end;
 $$ language plpgsql;
 
@@ -33,7 +33,7 @@ begin
 	if ammo<=90 then 
 		update gun_type set ammo_percentage=ammo_percentage+10.0;
 	else
-		raise exception 'Ammo is full. You can not add more';
+		raise exception 'Ammo is already full';
 	end if;
 end;
 $$ language plpgsql;

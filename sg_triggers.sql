@@ -4,7 +4,7 @@ create or replace function success_per_update() returns trigger as $success_per_
 begin
 	update shooter set shot_success = (success_percentage+shot_success*shot_count)/(shot_count+1),
 	shot_count=shot_count+1
-	where id=shooter_id and ssn=shooter_ssn; 
+	where ssn=shooter_ssn; 
 end;
 $success_per_update$ language plpgsql;
 
@@ -14,7 +14,7 @@ create trigger success_per_update after insert on shot for each row execute proc
 --update field throng trigger
 create or replace function field_throng_update() returns trigger as $field_throng_update$
 declare
-	val int
+	val int;
 begin
 	if TG_OP='delete' then
 		val:=-1;
@@ -37,7 +37,8 @@ declare
 begin
 	for rec in cur loop
 		if start_date<rec.stop or stop_date>rec.start then
-			raise exception 'Scheduling conflict appears. Try for another day or time-range.';
+			raise exception 'Scheduling conflict.' 
+				using hint='Try for another day or time-range.';
 			return null;
 		end if;
 	end loop;
@@ -51,9 +52,12 @@ create trigger already_scheduled before insert on shot for each row execute proc
 create or replace function control_shot_time() returns trigger as $control_shot_time$
 begin
 	if start_date.NEW<now() or stop_date.NEW<now() then
-		raise exception 'You can not add shot for before this time';
+		raise exception 'Time mess.'
+			using hint = 'You can not add shot for before this time';
 		return null;
 	elsif start_date>stop_date then
+		raise exception 'Time mess.'
+			using hint = 'Start date can not be after stop time';
 		return null;
 	end if;
 end;
@@ -68,6 +72,8 @@ declare
 begin
 	for rec in cur loop
 		if rec.gun_id=gun_id then
+			raise exception 'Busy gun.'
+				using hint = 'Another shooter uses this gun for this time.';
 			return null;
 		end if;
 	end loop;
@@ -75,6 +81,23 @@ end;
 $control_shot_gun_busy$ language plpgsql;
 
 create trigger control_shot_gun_busy before insert on shot for each row execute procedure control_shot_gun_busy();
+
+--control shooter can not be in many places at same time
+create or replace function control_hermione_shooter() returns trigger as $control_hermione_shooter$
+declare
+	cur cursor for select * from shot s where s.shooter_ssn=ssn;
+begin
+	for rec in cur loop
+		if start_date<rec.stop_date or stop_date>rec.start_date then
+			raise exception 'Hermione shooter'
+				using hint = 'Shooter can not be in many places at same time';
+			return null;
+		end if;
+	end loop;
+end;
+$control_hermione_shooter$ language plpgsql;
+
+create trigger control_hermione_shootter before insert on shot for each row execute procedure control_hermione_shooter();
 
 --clean dead schedules trigger
 create or replace function clean_dead_schedules() returns trigger as $clean_dead_schedules$
@@ -118,7 +141,8 @@ declare
 begin
 	select into ammo ammo_percentage from gun_type where id in (select gun_type_id from gun where id=gun_id);
 	if amma=0 then
-		raise exception 'Ammo is empty. Shooter cannot shot';
+		raise exception 'Empty ammo.'
+			using hint = 'Refill ammo before adding shot';
 		return null;
 	end if;
 end;
