@@ -1,12 +1,13 @@
-import sgs
+import gui
 import sys
+import db
 
 def main() :
-    gui = sgs.GUI(sys.argv)
+    g = gui.GUI(sys.argv)
 
-    gui.tabs.show()
+    g.tabs.show()
 
-    sys.exit(gui.exec_())
+    sys.exit(g.exec_())
 
 
 if (__name__ == '__main__') :
