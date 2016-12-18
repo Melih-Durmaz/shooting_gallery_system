@@ -5,6 +5,7 @@ begin
 	update shooter set shot_success = (success_percentage+shot_success*shot_count)/(shot_count+1),
 	shot_count=shot_count+1
 	where ssn=shooter_ssn; 
+	return null;
 end;
 $success_per_update$ language plpgsql;
 
@@ -24,10 +25,12 @@ begin
 	
 	update field set throng = throng + (stop-start)*10*val
 	where id=field_id; 
+	return null;
 end;
 $field_throng_update$ language plpgsql;
 
 create trigger field_throng_update after insert or delete on schedule for each row execute procedure field_throng_update();
+
 
 --control already scheduled trigger
 create or replace function already_scheduled() returns trigger as $already_scheduled$
@@ -39,10 +42,9 @@ begin
 		if start_date<rec.stop or stop_date>rec.start then
 			raise exception 'Scheduling conflict.' 
 				using hint='Try for another day or time-range.';
-			return null;
 		end if;
 	end loop;
-	
+	return null;
 end;
 $already_scheduled$ language plpgsql;
 
@@ -54,12 +56,11 @@ begin
 	if start_date.NEW<now() or stop_date.NEW<now() then
 		raise exception 'Time mess.'
 			using hint = 'You can not add shot for before this time';
-		return null;
 	elsif start_date>stop_date then
 		raise exception 'Time mess.'
 			using hint = 'Start date can not be after stop time';
-		return null;
 	end if;
+	return null;
 end;
 $control_shot_time$ language plpgsql;
 
@@ -74,9 +75,9 @@ begin
 		if rec.gun_id=gun_id then
 			raise exception 'Busy gun.'
 				using hint = 'Another shooter uses this gun for this time.';
-			return null;
 		end if;
 	end loop;
+	return null;
 end;
 $control_shot_gun_busy$ language plpgsql;
 
@@ -91,9 +92,9 @@ begin
 		if start_date<rec.stop_date or stop_date>rec.start_date then
 			raise exception 'Hermione shooter'
 				using hint = 'Shooter can not be in many places at same time';
-			return null;
 		end if;
 	end loop;
+	return null;
 end;
 $control_hermione_shooter$ language plpgsql;
 
@@ -110,6 +111,7 @@ begin
 			delete from schedule where field_id=rec.field_id and start=rec.start and stop=rec.stop;
 		end if;
 	end loop;
+	return null;
 end;
 $clean_dead_schedules$ language plpgsql;
 
@@ -118,7 +120,8 @@ create trigger clean_dead_schedules before insert on shot for each row execute p
 --clean deleted shoter's shots trigger
 create or replace function clean_shooter_shots() returns trigger as $clean_shooter_shots$
 begin
-	delete from shot where shooter_id=id and shooter_ssn=ssn;
+	delete from shot where shooter_ssn=OLD.ssn;
+	return null;
 end;
 $clean_shooter_shots$ language plpgsql;
 
@@ -129,6 +132,7 @@ create or replace function update_ammo() returns trigger as $update_ammo$
 begin
 	update gun_type set ammo_percentage = ammo_percentage-10.0
 	where id in (select gun_type_id from gun where id=gun_id);
+	return null;
 end;
 $update_ammo$ language plpgsql;
 
@@ -143,11 +147,27 @@ begin
 	if amma=0 then
 		raise exception 'Empty ammo.'
 			using hint = 'Refill ammo before adding shot';
-		return null;
 	end if;
+	return null;
 end;
 $is_ammo_empty$ language plpgsql; 
 
 create trigger is_ammo_empty before insert on shot for each row execute procedure is_ammo_empty();
 
 
+
+--control gun - field match
+create or replace function control_gun_field_match() returns trigger as $function gun_field_match$
+declare
+	cur cursor for select field_id from uses_field uf, gun g
+		where  g.id = NEW.gun_id and uf.gun_type_id = g.gun_type_id 
+		and uf.field_id = NEW.field_id;
+begin 
+-----------------------------------------------------
+
+
+-----------------------------------------------------
+end;
+$function gun_field_match$ language plpgsql;
+
+create trigger control_gun_field_match before insert on shot for each row execute procedure control_gun_field_match();

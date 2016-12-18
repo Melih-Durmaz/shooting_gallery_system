@@ -31,7 +31,7 @@ foreign key (field_id) references field(id)
 create table gun_type(
 id serial primary key,
 nm varchar(20) not null,
-ammo_percentage float not null
+ammo_percentage float default 50.0
 );
 
 --drop table uses_field;
@@ -48,9 +48,9 @@ foreign key (field_id) references field(id)
 --drop table gun;
 create table gun (
 id serial primary key,
-serial_number varchar(10) not null,
+serial_number varchar(10) not null unique,
 nm varchar(20) not null,
-gun_type_id int default -1,
+gun_type_id int default 0,
 foreign key (gun_type_id) references gun_type 
     on delete set default
 );
