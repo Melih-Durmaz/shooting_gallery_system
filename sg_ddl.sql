@@ -21,8 +21,8 @@ throng float default 0
 --drop table schedule
 create table schedule (
 field_id int,
-start timestamp not null,
-stop timestamp not null,
+start timestamp without time zone not null,
+stop timestamp without time zone not null,
 foreign key (field_id) references field(id)
     on delete set null
 );
@@ -61,9 +61,9 @@ create table shot (
 shooter_ssn numeric(10),
 gun_id int not null,
 field_id int not null,
-success_percentage int not null,
-start_date timestamp not null,
-stop_date timestamp not null,
+success_percentage float not null,
+start_date timestamp without time zone not null,
+stop_date timestamp without time zone not null,
 foreign key (shooter_ssn) references shooter
     on delete set null,
 foreign key (gun_id) references gun,

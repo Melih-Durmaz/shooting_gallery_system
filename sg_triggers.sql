@@ -1,4 +1,3 @@
-﻿--ADD EXCEPTIONS FOR ALL
 --update shooter success_percentage trigger
 create or replace function success_per_update() returns trigger as $success_per_update$
 begin
@@ -35,11 +34,11 @@ create trigger field_throng_update after insert or delete on schedule for each r
 --control already scheduled trigger
 create or replace function already_scheduled() returns trigger as $already_scheduled$
 declare 
-	cur cursor for select * from get_schedule(field_id);
+	cur cursor for select * from get_schedule(NEW.field_id);
 	
 begin
 	for rec in cur loop
-		if start_date<rec.stop or stop_date>rec.start then
+		if NEW.start_date<rec.stop or NEW.stop_date>rec.start then
 			raise exception 'Scheduling conflict.' 
 				using hint='Try for another day or time-range.';
 		end if;
@@ -144,7 +143,7 @@ declare
 	ammo float;
 begin
 	select into ammo ammo_percentage from gun_type where id in (select gun_type_id from gun where id=gun_id);
-	if amma=0 then
+	if ammo=0 then
 		raise exception 'Empty ammo.'
 			using hint = 'Refill ammo before adding shot';
 	end if;
@@ -157,17 +156,20 @@ create trigger is_ammo_empty before insert on shot for each row execute procedur
 
 
 --control gun - field match
-create or replace function control_gun_field_match() returns trigger as $function gun_field_match$
+create or replace function control_gun_field_match() returns trigger as $gun_field_match$
 declare
 	cur cursor for select field_id from uses_field uf, gun g
 		where  g.id = NEW.gun_id and uf.gun_type_id = g.gun_type_id 
 		and uf.field_id = NEW.field_id;
-begin 
------------------------------------------------------
-
-
------------------------------------------------------
+begin
+	for rec in cur loop
+		if rec.field_id != NEW.field_id then
+			raise exception 'Unmatchable gun-field.'
+				using hint = 'Try another gun or field for shot';
+		end if;
+	end loop;
+	return null;
 end;
-$function gun_field_match$ language plpgsql;
+$gun_field_match$ language plpgsql;
 
 create trigger control_gun_field_match before insert on shot for each row execute procedure control_gun_field_match();

@@ -9,6 +9,13 @@ class ORG:
         :return:
         '''
 
+	def getCombo(self,tableName,param=None):
+		'''
+		:param tableName:
+		:param param:
+		:return:
+		'''
+
     def addItem(self,tableName,paramLst):
         '''
         :param tableName:

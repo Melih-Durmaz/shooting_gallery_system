@@ -17,6 +17,14 @@ insert into gun_type (nm) values ('sword');
 insert into gun_type (nm) values ('spear');
 select * from gun_type;
 
+--uses_field
+insert into uses_field values (1,1);
+insert into uses_field values (4,1);
+insert into uses_field values (2,2);
+insert into uses_field values (3,3);
+insert into uses_field values (3,2);
+select * from uses_field;
+
 -- gun
 insert into gun (serial_number, nm, gun_type_id) values('abc123', 'turkish-bow', 1);
 insert into gun (serial_number, nm, gun_type_id) values('def123', 'zeus-spear', 4);
@@ -24,3 +32,18 @@ insert into gun (serial_number, nm, gun_type_id) values('def456', 'gandalf-stick
 insert into gun (serial_number, nm, gun_type_id) values('ghi123', 'zülfikar', 3);
 insert into gun (serial_number, nm, gun_type_id) values('abc321', 'cronos-ax', 2);
 select * from gun;
+
+--shot
+insert into shot values(1,1,1, 75.5, '2016-12-25 00:00:00.000000', '2016-12-25 01:00:00.000000');
+insert into shot values(1,1,1, 75.5, '2016-12-25 00:30:00.000000', '2016-12-25 01:30:00.000000');
+select * from shot;
+
+
+select now()::timestamp;
+
+
+
+
+
+
+
