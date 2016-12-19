@@ -35,12 +35,11 @@ select * from gun;
 
 --shot
 insert into shot values(1,1,1, 75.5, '2016-12-25 00:00:00.000000', '2016-12-25 01:00:00.000000');
-insert into shot values(1,1,1, 75.5, '2016-12-25 00:30:00.000000', '2016-12-25 01:30:00.000000');
+insert into shot values(0,2,1, 75.5, '2016-12-25 00:30:00.000000', '2016-12-25 01:30:00.000000');
 select * from shot;
 
 
 select now()::timestamp;
-
 
 
 
