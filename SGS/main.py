@@ -1,14 +1,18 @@
 import gui
 import sys
-import db
+from db import DB
+import organizer
 
 def main() :
-    g = gui.GUI(sys.argv)
+    dbname = "sgs"
+    user = "postgres"
+    pwd = ""
+    d = DB(dbname, user, pwd)
 
-    g.tabs.show()
-
-    sys.exit(g.exec_())
-
+    dataDict = {"ssn":5, "name_surname":'Tolkein', "member":True, "birth_date":'1985-05-04', "communication_info":'antalya'}
+    d.insertData('shooter',dataDict)
+    rows = d.getView("shooter_ob_name")
+    print(rows)
 
 if (__name__ == '__main__') :
     main()

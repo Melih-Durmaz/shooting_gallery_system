@@ -9,7 +9,7 @@ class DB() :
         self._port = port
 
     def connect(self):
-        return psycopg2._connect(self._dbname, self._user, self._pwd, self._host, self._port)
+        return psycopg2._connect("dbname='"+self._dbname+"' user='"+self._user+"' password='"+self._pwd+"' host='"+self._host+"' port='"+self._port+"'")
 
     def getView(self, viewName):
         conn = self.connect()
@@ -23,10 +23,12 @@ class DB() :
         keys = dataDict.keys()
         values = []
         for key in keys:
-            if isinstance(key, str) :
-                values.append("'" + dataDict[key] + "'")
+            if type(dataDict[key]) is str :
+                    values.append("'" + str(dataDict[key]) + "'")
             else :
-                values.append(dataDict[key])
+                values.append(str(dataDict[key]))
+
+        print(values)
 
         conn = self.connect()
         cur = conn.cursor()
@@ -37,7 +39,7 @@ class DB() :
     def deleteData(self, tableName, conditionDict):
         condition = []
         for key in conditionDict.keys() :
-            if isinstance(conditionDict[key], str) :
+            if type(conditionDict[key]) is str :
                 condition.append(key + " = '" + conditionDict[key] + "'")
             else :
                 condition.append(key + " = " + conditionDict[key])
@@ -49,8 +51,9 @@ class DB() :
 
     def runFunc(self, funcName, paramLst):
         for i in range(len(paramLst)) :
-            if isinstance(paramLst[i], str) :
+            if type(paramLst[i]) is str :
                 paramLst[i] = "'" + paramLst[i] + "'"
+            paramLst[i] = str(paramLst[i])
         conn = self.connect()
         cur = conn.cursor()
         cur.execute("select " + funcName + "(" + ','.join(paramLst) + ")")

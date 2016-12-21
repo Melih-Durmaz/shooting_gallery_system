@@ -1,3 +1,5 @@
+import db
+
 class ORG:
     def __init__(self, db):
         self._db = db
@@ -9,7 +11,7 @@ class ORG:
         :return:
         '''
 
-	def getCombo(self,tableName,param=None):
+    def getCombo(self,tableName,param=None):
 		'''
 		:param tableName:
 		:param param:

@@ -2,8 +2,9 @@ from PyQt4.QtGui import *
 
 
 class GUI(QApplication):
-    def __init__(self, args):
+    def __init__(self, args, o):
         QApplication.__init__(self, args)
+        self._o = o;
         self.tabs = QTabWidget()
         self.shooterTab = QWidget()
         self.fieldTab = QWidget()
