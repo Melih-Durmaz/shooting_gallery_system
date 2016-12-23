@@ -1,18 +1,21 @@
-import gui
+from gui import GUI
 import sys
 from db import DB
-import organizer
+from org import ORG
 
 def main() :
+
     dbname = "sgs"
     user = "postgres"
-    pwd = ""
-    d = DB(dbname, user, pwd)
+    pwd = "43951515"
 
-    dataDict = {"ssn":5, "name_surname":'Tolkein', "member":True, "birth_date":'1985-05-04', "communication_info":'antalya'}
-    d.insertData('shooter',dataDict)
-    rows = d.getView("shooter_ob_name")
-    print(rows)
+    d = DB(dbname, user, pwd)
+    o = ORG(d)
+    g = GUI(sys.argv, o)
+
+    g.mainWindow.show()
+    sys.exit(g.exec_())
+
 
 if (__name__ == '__main__') :
     main()

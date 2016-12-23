@@ -1,4 +1,4 @@
-﻿--selecting schedule field id given
+﻿-- selecting schedule field id given
 create or replace function get_schedule(fi schedule.field_id%type) 
 	returns table(start_date schedule.start%type, stop_date schedule.stop%type) as $$
 begin
@@ -6,7 +6,7 @@ begin
 end;
 $$ language plpgsql;
 
---selecting shots shooter id given
+-- selecting shots shooter id given
 create or replace function get_shots_from_shooter(ss shot.shooter_ssn%type)
 	returns table(gun_id int, field_id int, success_percentage int, start_date timestamp, stop_date timestamp) as $$
 begin
@@ -15,7 +15,7 @@ begin
 end;
 $$ language plpgsql;
 
---selecting shots field id given
+-- selecting shots field id given
 create or replace function get_shots_from_field(fi shot.field_id%type)
 	returns table(shooter_id int, shooter_ssn numeric(10),gun_id int, success_percentage int, start_date timestamp, stop_date timestamp) as $$
 begin
@@ -24,7 +24,7 @@ begin
 end;
 $$ language plpgsql;
 
---increasing ammo
+-- increasing ammo
 create or replace function increase_ammo(gi gun_type.id%type) returns void as $$
 declare
 	ammo float;
@@ -38,18 +38,21 @@ begin
 end;
 $$ language plpgsql;
 
---selecting fields gun id given
+-- selecting fields gun id given
 create or replace function get_fields_from_gun(gi gun.id%type) 
-	returns table(id int, lctn varchar(100), nm varchar(20), max_range float, throng float) as $$
+	returns table(id int, nm varchar(20)) as $$
 begin
-	return query select f.id,f.lctn,f.nm,f.max_range,f.throng from field f, gun g, uses_field uf  
+	return query select f.id, f.nm from field f, gun g, uses_field uf  
 	where g.gun_type_id=uf.gun_type_id and uf.field_id=f.id; 
 end;
 $$ language plpgsql;
 
 
-
-
-
-
-	
+-- selecting guns field id given
+create or replace function get_guns_from_field(fi field.id%type)
+	returns table(id int, nm varchar(20)) as $$
+begin
+	return query select g.id, g.nm from gun g, field f, uses_field uf
+	where  g.gun_type_id=uf.gun_type_id and uf.field_id=f.id;
+end;
+$$ language plpgsql;

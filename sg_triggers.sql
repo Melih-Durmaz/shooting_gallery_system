@@ -1,4 +1,4 @@
---control shot time---------------------------------------------------------------------------------------
+-- control shot time---------------------------------------------------------------------------------------
 create or replace function control_shot_time() returns trigger as $control_shot_time$
 begin
 	if NEW.start_date<now() or NEW.stop_date<now() then
@@ -15,7 +15,7 @@ begin
 end;
 $control_shot_time$ language plpgsql;
 
---control already scheduled trigger-----------------------------------------------------------------------
+-- control already scheduled trigger-----------------------------------------------------------------------
 create or replace function already_scheduled() returns trigger as $already_scheduled$
 declare 
 	cur cursor for select * from get_schedule(NEW.field_id);
@@ -32,7 +32,7 @@ begin
 end;
 $already_scheduled$ language plpgsql;
 
---control gun_type ammo empty----------------------------------------------------------------------------
+-- control gun_type ammo empty----------------------------------------------------------------------------
 create or replace function is_ammo_empty() returns trigger as $is_ammo_empty$
 declare
 	ammo float;
@@ -48,7 +48,7 @@ begin
 end;
 $is_ammo_empty$ language plpgsql; 
 
---control shooter can not be in many places at same time--------------------------------------------------
+-- control shooter can not be in many places at same time--------------------------------------------------
 create or replace function control_hermione_shooter() returns trigger as $control_hermione_shooter$
 declare
 	cur cursor for select * from shot s where s.shooter_ssn=NEW.shooter_ssn;
@@ -65,7 +65,7 @@ begin
 end;
 $control_hermione_shooter$ language plpgsql;
 
---control gun - field match-----------------------------------------------------------------------------
+-- control gun - field match-----------------------------------------------------------------------------
 create or replace function control_gun_field_match() returns trigger as $gun_field_match$
 declare
 	cur cursor for select field_id from uses_field uf, gun g
@@ -84,7 +84,7 @@ begin
 end;
 $gun_field_match$ language plpgsql;
 
---control shot gun if busy for this time-------------------------------------------------------------------
+-- control shot gun if busy for this time-------------------------------------------------------------------
 create or replace function control_shot_gun_busy() returns trigger as $control_shot_gun_busy$ 
 declare
 	cur cursor for select * from shot s where s.start_date<NEW.stop_date and s.stop_date>NEW.start_date;
@@ -101,7 +101,7 @@ begin
 end;
 $control_shot_gun_busy$ language plpgsql;
 
---clean dead schedules trigger---------------------------------------------------------------------------
+-- clean dead schedules trigger---------------------------------------------------------------------------
 create or replace function clean_dead_schedules() returns trigger as $clean_dead_schedules$
 declare
 	cur cursor for select * from schedule;
@@ -117,7 +117,7 @@ begin
 end;
 $clean_dead_schedules$ language plpgsql;
 
---update schedule shot by shot trigger----------------------------------------------------------------------
+-- update schedule shot by shot trigger----------------------------------------------------------------------
 create or replace function insert_schedule() returns trigger as $insert_schedule$
 begin 
 	insert into schedule values (NEW.field_id, NEW.start_date, NEW.stop_date);
@@ -126,7 +126,7 @@ begin
 end;
 $insert_schedule$ language plpgsql;
 
---update gun_type ammo trigger---------------------------------------------------------------------------
+-- update gun_type ammo trigger---------------------------------------------------------------------------
 create or replace function update_ammo() returns trigger as $update_ammo$
 begin
 	update gun_type set ammo_percentage = ammo_percentage-10.0
@@ -136,7 +136,7 @@ begin
 end;
 $update_ammo$ language plpgsql;
 
---update shooter success_percentage trigger----------------------------------------------------------------
+-- update shooter success_percentage trigger----------------------------------------------------------------
 create or replace function success_per_update() returns trigger as $success_per_update$
 begin
 	update shooter set shot_success = (NEW.success_percentage+shot_success*shot_count)/(shot_count+1),
@@ -147,7 +147,7 @@ begin
 end;
 $success_per_update$ language plpgsql;
 
---clean deleted shoter's shots trigger-------------------------------------------------------------------
+-- clean deleted shoter's shots trigger-------------------------------------------------------------------
 create or replace function clean_shooter_shots() returns trigger as $clean_shooter_shots$
 begin
 	delete from shot where shooter_ssn=OLD.ssn;
@@ -156,7 +156,7 @@ begin
 end;
 $clean_shooter_shots$ language plpgsql;
 
---update field throng trigger-----------------------------------------------------------------------------
+-- update field throng trigger-----------------------------------------------------------------------------
 create or replace function field_throng_update() returns trigger as $field_throng_update$
 begin
 	update field set throng = throng + extract(hour from (NEW.stop-NEW.start))*10
@@ -167,8 +167,22 @@ end;
 $field_throng_update$ language plpgsql;
 
 
+-- clean uses field after delete field----------------------------------------------------------------------
+create or replace function clean_uses_field_after_deleted_field() returns trigger as $clean_uses_field_after_deleted_field$
+begin
+	delete from uses_field where field_id=OLD.id;
+end;
+$clean_uses_field_after_deleted_field$ language plpgsql;
 
---triggers before shot
+-- clean uses field after delete gun type-------------------------------------------------------------------
+create or replace function clean_uses_field_after_deleted_gun_type() returns trigger as $clean_uses_field_after_deleted_gun_type$
+begin
+	delete from uses_field where gun_type_id=OLD.id;
+end;
+$clean_uses_field_after_deleted_gun_type$ language plpgsql;
+
+
+-- triggers before shot
 create trigger control_shot_time before insert on shot for each row execute procedure control_shot_time();
 create trigger already_scheduled before insert on shot for each row execute procedure already_scheduled();
 create trigger is_ammo_empty before insert on shot for each row execute procedure is_ammo_empty();
@@ -178,15 +192,21 @@ create trigger control_shot_gun_busy before insert on shot for each row execute 
 create trigger clean_dead_schedules before insert on shot for each row execute procedure clean_dead_schedules();
 
 
---triggers after shot
+-- triggers after shot
 create trigger insert_schedule after insert on shot for each row execute procedure insert_schedule();
 create trigger update_ammo after insert on shot for each row execute procedure update_ammo();
 create trigger success_per_update after insert on shot for each row execute procedure success_per_update();
 
 
---triggers after shooter
+-- triggers after shooter
 create trigger clean_shooter_shots after delete on shooter for each row execute procedure clean_shooter_shots();
 
 
---after schedule
+-- trigggers after schedule
 create trigger field_throng_update after insert on schedule for each row execute procedure field_throng_update();
+
+-- triggers after gun_type
+create trigger clean_uses_field_after_deleted_gun_type after delete on gun_type for each row execute procedure clean_uses_field_after_deleted_gun_type();
+
+-- triggers after field
+create trigger clean_uses_field_after_deleted_field after delete on field for each row execute procedure clean_uses_field_after_deleted_field();
