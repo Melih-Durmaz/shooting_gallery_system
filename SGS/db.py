@@ -13,13 +13,16 @@ class DB() :
 
     def getView(self, viewName):
         conn = self.connect()
-        cur = conn.cursor()
-        cur.execute("select * from " + viewName)
-        rows = cur.fetchall()
+        try :
+            cur = conn.cursor()
+            cur.execute("select * from " + viewName)
+            rows = cur.fetchall()
+        except Exception as e:
+            raise Exception(e.message)
         conn.close()
         return rows
 
-    def insertData(self, tableName, dataDict) :
+    def insertData(self, tableName, dataDict, returning=None) :
         keys = dataDict.keys()
         values = []
         for key in keys:
@@ -28,11 +31,19 @@ class DB() :
             else :
                 values.append(str(dataDict[key]))
 
-        print(values)
-
+        if returning == None:
+            query = "insert into " + tableName + "(" + ','.join(keys) + ") values (" + ','.join(values) + ")"
+        else :
+            query = "insert into " + tableName + "(" + ','.join(keys) + ") values (" + ','.join(values) + ") returning " + returning
         conn = self.connect()
         cur = conn.cursor()
-        cur.execute("insert into " + tableName + "(" + ','.join(keys) + ") values (" + ','.join(values) + ")")
+        cur.execute(query)
+
+        if returning != None :
+            ret = cur.fetchall()
+            conn.close()
+            return ret
+
         conn.commit()
         conn.close()
 
@@ -60,3 +71,12 @@ class DB() :
         rows = cur.fetchall()
         conn.close()
         return rows
+
+    def runQuery(self, query):
+        conn = self.connect()
+        cur = conn.cursor()
+        cur.execute(query)
+        if 'select' in query :
+            rows = cur.fetchall
+            conn.close()
+            return rows

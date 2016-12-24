@@ -49,8 +49,6 @@ class ORG:
                 for j in range(len(tableData[i])) :
                     table.setItem(i,j, QTableWidgetItem(str(tableData[i][j])))
 
-
-
         return table
 
     def getCombo(self,comboName, ret, param=None):
@@ -68,14 +66,19 @@ class ORG:
 
 
     def addItem(self,tableName,param):
+        ret = None
         if "shooter" in tableName:
             cols = self._shootercols
+            ret = 'ssn'
         elif "field" in tableName:
             cols = self._fieldcols
+            ret = 'id'
         elif "gun_type" in tableName:
             cols = self._guntypecols
+            ret = 'id'
         elif "gun" in tableName:
             cols = self._guncols
+            ret = 'id'
         elif "shot" in tableName:
             cols = self._shotcols
         elif "schedule" in tableName:
@@ -87,6 +90,12 @@ class ORG:
         for i in range(len(cols)) :
             dict[cols[i]] = param[i]
 
+        if ret == None :
+            self._db.insertData(tableName,dict)
+        else :
+            ret = self._db.insertData(tableName, dict, ret)
+            return ret
+
     def delItem(self,tableName,param):
         if "shooter" in tableName:
             col = "ssn"
@@ -96,3 +105,4 @@ class ORG:
         dict = {col:param}
 
         self._db.deleteData(tableName, dict)
+

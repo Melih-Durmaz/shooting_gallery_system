@@ -3,8 +3,22 @@ import sys
 from db import DB
 from org import ORG
 
+class A:
+    def __init__(self):
+        print ("i am A")
+
+    def throw(self):
+        raise Exception('catch me if you can')
+
 def main() :
 
+    a = A()
+    try:
+        a.throw()
+    except Exception as e:
+        print ('I caught you : ' + repr(e))
+
+'''
     dbname = "sgs"
     user = "postgres"
     pwd = "43951515"
@@ -15,7 +29,7 @@ def main() :
 
     g.mainWindow.show()
     sys.exit(g.exec_())
-
+'''
 
 if (__name__ == '__main__') :
     main()
