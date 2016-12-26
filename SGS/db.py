@@ -13,12 +13,13 @@ class DB() :
 
     def getView(self, viewName):
         conn = self.connect()
+        cur = conn.cursor()
         try :
-            cur = conn.cursor()
             cur.execute("select * from " + viewName)
-            rows = cur.fetchall()
-        except Exception as e:
-            raise Exception(e.message)
+        except psycopg2.Error as e:
+            conn.close()
+            raise e
+        rows = cur.fetchall()
         conn.close()
         return rows
 
@@ -37,7 +38,11 @@ class DB() :
             query = "insert into " + tableName + "(" + ','.join(keys) + ") values (" + ','.join(values) + ") returning " + returning
         conn = self.connect()
         cur = conn.cursor()
-        cur.execute(query)
+        try :
+            cur.execute(query)
+        except psycopg2.InternalError as e:
+            conn.close()
+            raise e
 
         if returning != None :
             ret = cur.fetchall()
@@ -56,7 +61,11 @@ class DB() :
                 condition.append(key + " = " + conditionDict[key])
         conn = self.connect()
         cur = conn.cursor()
-        cur.execute("delete from " + tableName + " where " + ' and '.join(condition))
+        try:
+            cur.execute("delete from " + tableName + " where " + ' and '.join(condition))
+        except psycopg2.Error as e:
+            conn.close()
+            raise e
         conn.commit()
         conn.close()
 
@@ -67,7 +76,11 @@ class DB() :
             paramLst[i] = str(paramLst[i])
         conn = self.connect()
         cur = conn.cursor()
-        cur.execute("select " + funcName + "(" + ','.join(paramLst) + ")")
+        try:
+            cur.execute("select " + funcName + "(" + ','.join(paramLst) + ")")
+        except psycopg2.InternalError as e:
+            conn.close()
+            raise e
         rows = cur.fetchall()
         conn.close()
         return rows
@@ -75,7 +88,11 @@ class DB() :
     def runQuery(self, query):
         conn = self.connect()
         cur = conn.cursor()
-        cur.execute(query)
+        try:
+            cur.execute(query)
+        except psycopg2.Error as e:
+            conn.close()
+            raise e
         if 'select' in query :
             rows = cur.fetchall
             conn.close()

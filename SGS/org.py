@@ -1,10 +1,5 @@
 from db import DB
 from PyQt4.QtGui import *
-'''
-things to do:
-- add param controller for all functions
-- add exception raiser for throwing exceptions to gui
-'''
 class ORG:
     def __init__(self, db):
         self._db = db
@@ -38,9 +33,10 @@ class ORG:
         table = QTableWidget()
 
         if param == None :
-
-            tableData = self._db.getView(tableName)
-            print (tableData)
+            try :
+                tableData = self._db.getView(tableName)
+            except Exception as e:
+                raise e
             table.setRowCount(len(tableData))
             table.setColumnCount(len(tableData[0]))
             table.setHorizontalHeaderLabels(labels)
@@ -53,16 +49,25 @@ class ORG:
 
     def getCombo(self,comboName, ret, param=None):
         if param==None :
-            comboData = self._db.getView(comboName)
+            try :
+                comboData = self._db.getView(comboName)
+            except Exception as e:
+                raise e
             combo = QComboBox()
             for i in range(len(comboData)):
                 ret[i] = comboData[i][0]
                 combo.addItem(comboData[i][1])
         else :
             if "gun_combo"==comboName:
-                self._db.runFunc("get_guns_from_field", param)
+                try :
+                    self._db.runFunc("get_guns_from_field", param)
+                except Exception as e:
+                    raise e
             elif "field_combo"==comboName:
-                self._db.runFunc("get_fields_from_gun", param)
+                try :
+                    self._db.runFunc("get_fields_from_gun", param)
+                except Exception as e:
+                    raise e
 
 
     def addItem(self,tableName,param):
@@ -91,9 +96,15 @@ class ORG:
             dict[cols[i]] = param[i]
 
         if ret == None :
-            self._db.insertData(tableName,dict)
+            try :
+                self._db.insertData(tableName,dict)
+            except Exception as e:
+                raise e
         else :
-            ret = self._db.insertData(tableName, dict, ret)
+            try :
+                ret = self._db.insertData(tableName, dict, ret)
+            except Exception as e:
+                raise e
             return ret
 
     def delItem(self,tableName,param):
@@ -103,6 +114,8 @@ class ORG:
             col = "id"
 
         dict = {col:param}
-
-        self._db.deleteData(tableName, dict)
+        try:
+            self._db.deleteData(tableName, dict)
+        except Exception as e:
+            raise e
 

@@ -1,9 +1,6 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-'''
-things to do:
-- add exception catcher and create pop ups for them
-'''
+
 class GUI(QApplication):
     def __init__(self, args, org):
         QApplication.__init__(self, args)
@@ -44,8 +41,6 @@ class GUI(QApplication):
         # table part
         tableWidget = self._o.getTable('shooter_ob_name')
 
-        #tableWidget.setLayout(tableLayout)
-
         # new shooter part
         newShooterWidget = QWidget()
         newShooterLayout = QFormLayout()
@@ -69,11 +64,12 @@ class GUI(QApplication):
 
         newShooterWidget.setLayout(newShooterLayout)
 
+
         filterLayout = QHBoxLayout()
 
         # Creates a combo box
         filterCombo = QComboBox()
-        items = ['None', 'Location', 'Name', 'Throng']
+        items = ['None', 'Success', 'Members', 'Not Members']
         filterCombo.addItems(items)
         filterCombo.setMaximumWidth(150)
 
@@ -89,7 +85,6 @@ class GUI(QApplication):
         #filterInput.setFixedWidth(100)
 
         filterLayout.addWidget(filterCombo)
-        #filterLayout.addWidget(filterInput)
         filterLayout.addWidget(filterButton)
         filterLayout.setAlignment(Qt.AlignLeft)
 

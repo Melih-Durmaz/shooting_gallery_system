@@ -9,6 +9,11 @@ begin
 		raise exception 'Time mess.'
 			using hint = 'Start date can not be after stop time';
 		return NULL;
+	elsif NEW.start_date < NEW.stop_date or NEW.start_date > NEW.stop_date then
+	else
+		raise exception 'Time mess.'
+			using hint = 'Start and stop date can not be same';
+		return NULL;
 	end if;
 	raise notice 'control_shot_time';
 	return NEW;
@@ -71,14 +76,24 @@ declare
 	cur cursor for select field_id from uses_field uf, gun g
 		where  g.id = NEW.gun_id and uf.gun_type_id = g.gun_type_id 
 		and uf.field_id = NEW.field_id;
+	c	int;
 begin
-	for rec in cur loop
+	c:=0;
+    for rec in cur loop
 		if rec.field_id != NEW.field_id then
 			raise exception 'Unmatchable gun-field.'
 				using hint = 'Try another gun or field for shot';
 			return NULL;
 		end if;
+        c := c+1;
 	end loop;
+    
+    if c = 0 then
+    	raise exception 'Unmatchable gun-field.'
+			using hint = 'Try another gun or field for shot';
+		return NULL;
+    end if;
+    
 	raise notice 'gun_field_match';
 	return NEW;
 end;
