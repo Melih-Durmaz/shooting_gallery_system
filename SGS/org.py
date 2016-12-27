@@ -4,19 +4,19 @@ class ORG:
     def __init__(self, db):
         self._db = db
 
-        self._shooterlabels = ("SSN", "Name Surname", "Birth Date", "Communication Info", "Member", "Shot Success", "Shot Count")
-        self._fieldlabels = ("ID", "Name", "Location", "Max Range", "Throng")
-        self._guntypelabels = ("ID", "Name", "Ammo Percentage")
-        self._gunlabels = ("ID", "Serial Number", "Name", "Gun Type")
-        self._shotlabels = ("Shooter", "Gun", "Field", "Success Percentage", "Starts At", "Ends At")
+        self._shooterlabels = ("SSN", "Name Surname", "Birth Date", "Communication Info", "Member", "Shot Success", "Shot Count",)
+        self._fieldlabels = ("ID", "Name", "Location", "Max Range", "Throng",)
+        self._guntypelabels = ("ID", "Name", "Ammo Percentage",)
+        self._gunlabels = ("ID", "Serial Number", "Name", "Gun Type",)
+        self._shotlabels = ("Shooter", "Gun", "Field", "Success Percentage", "Starts At", "Ends At",)
 
-        self._shootercols = ("ssn", "name_surname", "birth_date", "communication_info", "member")
-        self._fieldcols = ("nm", "lctn", "max_range")
-        self._schedulecols = ("field_id", "start", "stop")
-        self._guntypecols = ("nm")
-        self._usesfieldcols = ("gun_type_id", "field_id")
-        self._guncols = ("serial_number", "nm", "gun_type_id")
-        self._shotcols = ("shooter_ssn", "gun_id", "field_id", "success_percentage", "start_date", "stop_date")
+        self._shootercols = ("ssn", "name_surname", "birth_date", "communication_info", "member",)
+        self._fieldcols = ("nm", "lctn", "max_range",)
+        self._schedulecols = ("field_id", "start", "stop",)
+        self._guntypecols = ("nm",)
+        self._usesfieldcols = ("gun_type_id", "field_id",)
+        self._guncols = ("serial_number", "nm", "gun_type_id",)
+        self._shotcols = ("shooter_ssn", "gun_id", "field_id", "success_percentage", "start_date", "stop_date",)
 
     def getTable(self,tableName,param=None):
         if "shooter" in tableName:
@@ -73,39 +73,42 @@ class ORG:
     def addItem(self,tableName,param):
         ret = None
         if "shooter" in tableName:
+            if len(param) != 5 :
+                raise Exception('You missed some parameters for inserting.')
             cols = self._shootercols
-            ret = 'ssn'
         elif "field" in tableName:
+            if len(param) != 3 :
+                raise Exception('You missed some parameters for inserting.')
             cols = self._fieldcols
-            ret = 'id'
         elif "gun_type" in tableName:
+            if len(param) != 1 :
+                raise Exception('You missed some parameters for inserting.')
             cols = self._guntypecols
-            ret = 'id'
         elif "gun" in tableName:
+            if len(param) != 3 :
+                raise Exception('You missed some parameters for inserting.')
             cols = self._guncols
-            ret = 'id'
         elif "shot" in tableName:
+            if len(param) != 6 :
+                raise Exception('You missed some parameters for inserting.')
             cols = self._shotcols
         elif "schedule" in tableName:
+            if len(param) != 3 :
+                raise Exception('You missed some parameters for inserting.')
             cols = self._schedulecols
         elif "uses_field" in tableName:
+            if len(param) != 2 :
+                raise Exception('You missed some parameters for inserting.')
             cols = self._usesfieldcols
 
         dict = {}
         for i in range(len(cols)) :
             dict[cols[i]] = param[i]
 
-        if ret == None :
-            try :
-                self._db.insertData(tableName,dict)
-            except Exception as e:
-                raise e
-        else :
-            try :
-                ret = self._db.insertData(tableName, dict, ret)
-            except Exception as e:
-                raise e
-            return ret
+        try :
+            self._db.insertData(tableName,dict)
+        except Exception as e:
+            raise e
 
     def delItem(self,tableName,param):
         if "shooter" in tableName:

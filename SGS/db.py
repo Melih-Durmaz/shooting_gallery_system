@@ -23,7 +23,7 @@ class DB() :
         conn.close()
         return rows
 
-    def insertData(self, tableName, dataDict, returning=None) :
+    def insertData(self, tableName, dataDict) :
         keys = dataDict.keys()
         values = []
         for key in keys:
@@ -32,10 +32,8 @@ class DB() :
             else :
                 values.append(str(dataDict[key]))
 
-        if returning == None:
-            query = "insert into " + tableName + "(" + ','.join(keys) + ") values (" + ','.join(values) + ")"
-        else :
-            query = "insert into " + tableName + "(" + ','.join(keys) + ") values (" + ','.join(values) + ") returning " + returning
+        query = "insert into " + tableName + "(" + ','.join(keys) + ") values (" + ','.join(values) + ")"
+
         conn = self.connect()
         cur = conn.cursor()
         try :
@@ -43,11 +41,6 @@ class DB() :
         except psycopg2.InternalError as e:
             conn.close()
             raise e
-
-        if returning != None :
-            ret = cur.fetchall()
-            conn.close()
-            return ret
 
         conn.commit()
         conn.close()
