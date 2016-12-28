@@ -33,7 +33,7 @@ class ORG:
         table = QTableWidget()
 
         if param == None :
-            try :
+            try:
                 tableData = self._db.getView(tableName)
             except Exception as e:
                 raise e
@@ -47,28 +47,29 @@ class ORG:
 
         return table
 
-    def getCombo(self,comboName, ret, param=None):
-        if param==None :
-            try :
+    def getCombo(self, comboName, ret, param=None):
+        if param == None:
+            try:
                 comboData = self._db.getView(comboName)
             except Exception as e:
                 raise e
-        else :
-            if "gun_combo"==comboName:
-                try :
+        else:
+            if "gun_combo" == comboName:
+                try:
                     comboData = self._db.runFunc("get_guns_from_field", param)
                 except Exception as e:
                     raise e
-            elif "field_combo"==comboName:
-                try :
+            elif "field_combo" == comboName:
+                try:
                     comboData = self._db.runFunc("get_fields_from_gun", param)
                 except Exception as e:
                     raise e
         combo = QComboBox()
         for i in range(len(comboData)):
-            ret.append(comboData[i][0])
+            ret.append(int(comboData[i][0]))
             combo.addItem(comboData[i][1])
         return combo
+
 
     def addItem(self,tableName,param):
         ret = None

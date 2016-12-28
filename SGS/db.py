@@ -69,12 +69,14 @@ class DB() :
             paramLst[i] = str(paramLst[i])
         conn = self.connect()
         cur = conn.cursor()
+        query = "select " + funcName + "(" + ','.join(paramLst) + ")"
         try:
-            cur.execute("select " + funcName + "(" + ','.join(paramLst) + ")")
+            cur.execute(query)
         except psycopg2.InternalError as e:
             conn.close()
             raise e
         rows = cur.fetchall()
+        rows[0] = rows[0][0][1:-1].split(',')
         conn.close()
         return rows
 
