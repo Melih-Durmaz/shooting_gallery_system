@@ -127,10 +127,14 @@ class GUI(QApplication):
         # Handling events
         newShooterInfo = [SSN.text()]
         QObject.connect(addButton, SIGNAL("clicked()"),
-                        lambda: self.addShooter('shooter',SSN.text(),nameSurname.text(),
+                        lambda: self.addShooter('shooter' ,
+                                                SSN.text(),
+                                                nameSurname.text(),
                                                 birthDate.text(),
                                                 communication.text(),
-                                                membershipCombo.currentText(), tableWidget))
+                                                membershipCombo.currentText(),
+                                                tableWidget,
+                                                shooterLayout))
 
         QObject.connect(filterButton, SIGNAL("clicked()"), lambda: buttonClicked())
 
@@ -481,7 +485,7 @@ class GUI(QApplication):
         self.mainWindow.move((resolution.width() / 2) - (self.mainWindow.frameSize().width() / 2),
                              (resolution.height() / 2) - (self.mainWindow.frameSize().height() / 2))
 
-    def addShooter(self, tableName,SSN,nameSurname,birthDate,communication,membershipCombo, shooterTable):
+    def addShooter(self, tableName,SSN,nameSurname,birthDate,communication,membershipCombo, tableWidget, tableLayout):
         newShooterData = []
 
         newShooterData.append(int(SSN))
@@ -496,8 +500,10 @@ class GUI(QApplication):
 
         try:
             self.__o.addItem(tableName, newShooterData)
-            shooterTable = self.__o.getTable('shooter')
-            # i dont know how to refresh :/
+            tableLayout.itemAt(1).widget().setParent(None)
+            tableWidget = self.__o.getTable('shooter')
+            tableLayout.addWidget(tableWidget)
+            tableLayout.update()
         except Exception as e:
             self.showPopupMessage(e.message)
 

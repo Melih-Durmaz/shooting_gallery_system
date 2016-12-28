@@ -8,7 +8,7 @@ from org import ORG
 def main() :
     dbname = "sgs"
     user = "postgres"
-    pwd = ""
+    pwd = "43951515"
 
     d = DB(dbname, user, pwd)
     o = ORG(d)

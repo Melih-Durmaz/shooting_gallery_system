@@ -5,7 +5,7 @@ create view shooter_all_ob_member as select * from shooter where member=true ord
 create view shooter_not_member as select * from shooter where member=false;
 
 -- shooters for combo box
-create view shooter_combo as select ssn, name_surname from shooter where member=true order by name_surname;
+create view shooter_combo as select ssn, name_surname from shooter order by name_surname;
 
 -- field views
 create view field_ob_name as select * from field order by nm;

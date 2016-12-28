@@ -53,22 +53,22 @@ class ORG:
                 comboData = self._db.getView(comboName)
             except Exception as e:
                 raise e
-            combo = QComboBox()
-            for i in range(len(comboData)):
-                ret[i] = comboData[i][0]
-                combo.addItem(comboData[i][1])
         else :
             if "gun_combo"==comboName:
                 try :
-                    self._db.runFunc("get_guns_from_field", param)
+                    comboData = self._db.runFunc("get_guns_from_field", param)
                 except Exception as e:
                     raise e
             elif "field_combo"==comboName:
                 try :
-                    self._db.runFunc("get_fields_from_gun", param)
+                    comboData = self._db.runFunc("get_fields_from_gun", param)
                 except Exception as e:
                     raise e
-
+        combo = QComboBox()
+        for i in range(len(comboData)):
+            ret.append(comboData[i][0])
+            combo.addItem(comboData[i][1])
+        return combo
 
     def addItem(self,tableName,param):
         ret = None

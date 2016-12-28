@@ -43,7 +43,7 @@ create or replace function get_fields_from_gun(gi gun.id%type)
 	returns table(id int, nm varchar(20)) as $$
 begin
 	return query select f.id, f.nm from field f, gun g, uses_field uf  
-	where g.gun_type_id=uf.gun_type_id and uf.field_id=f.id; 
+	where g.gun_type_id=uf.gun_type_id and uf.field_id=f.id and g.gun_type_id=gi; 
 end;
 $$ language plpgsql;
 
@@ -53,6 +53,6 @@ create or replace function get_guns_from_field(fi field.id%type)
 	returns table(id int, nm varchar(20)) as $$
 begin
 	return query select g.id, g.nm from gun g, field f, uses_field uf
-	where  g.gun_type_id=uf.gun_type_id and uf.field_id=f.id;
+	where  g.gun_type_id=uf.gun_type_id and uf.field_id=f.id and f.id = fi;
 end;
 $$ language plpgsql;
