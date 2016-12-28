@@ -90,7 +90,7 @@ class GUI(QApplication):
 
         # Creates a button
         filterButton = QPushButton()
-        filterButton.setText('Filter')
+        filterButton.setText('Order')
         filterButton.setMaximumWidth(150)
         #Shooter filtreleme
 
@@ -115,17 +115,17 @@ class GUI(QApplication):
         addShooterText = QLabel()
         addShooterText.setText('Please enter the required information below to add a new shooter:')
 
-        shooterLayout.addWidget(filterWidget)
-        shooterLayout.addWidget(tableWidget)
+
         shooterLayout.addWidget(addShooterText)
         shooterLayout.addWidget(newShooterWidget)
         shooterLayout.addWidget(memberShipWidget)
         shooterLayout.addWidget(addButton)
+        shooterLayout.addWidget(filterWidget)
+        shooterLayout.addWidget(tableWidget)
 
         self.shooterTab.setLayout(shooterLayout)
 
         # Handling events
-        newShooterInfo = [SSN.text()]
         QObject.connect(addButton, SIGNAL("clicked()"),
                         lambda: self.addShooter('shooter' ,
                                                 SSN.text(),
@@ -136,7 +136,8 @@ class GUI(QApplication):
                                                 tableWidget,
                                                 shooterLayout))
 
-        QObject.connect(filterButton, SIGNAL("clicked()"), lambda: buttonClicked())
+        QObject.connect(filterButton, SIGNAL("clicked()"), lambda: self.orderShooters(filterCombo.currentText(),
+                                                                                      shooterLayout))
 
     def setFieldTab(self):
         fieldLayout = QVBoxLayout()
@@ -165,7 +166,7 @@ class GUI(QApplication):
 
         # Creates a combo box
         filterCombo = QComboBox()
-        items = ['None', 'Location', 'Name', 'Throng']
+        items = ['None', 'ID', 'Name', 'Throng']
         filterCombo.addItems(items)
         filterCombo.setMaximumWidth(150)
 
@@ -197,13 +198,27 @@ class GUI(QApplication):
         addFieldText = QLabel()
         addFieldText.setText('Please enter the required information below to add a new field:')
 
-        fieldLayout.addWidget(filterWidget)
-        fieldLayout.addWidget(tableWidget)
+
         fieldLayout.addWidget(addFieldText)
         fieldLayout.addWidget(newFieldWidget)
         fieldLayout.addWidget(addButton)
+        fieldLayout.addWidget(filterWidget)
+        fieldLayout.addWidget(tableWidget)
 
         self.fieldTab.setLayout(fieldLayout)
+
+        # Handling events
+        QObject.connect(addButton, SIGNAL("clicked()"),
+                        lambda: self.addField('field',
+                                                location.text(),
+                                                name.text(),
+                                                maxRange.text(),
+                                                tableWidget,
+                                                fieldLayout))
+
+        QObject.connect(filterButton, SIGNAL("clicked()"), lambda: self.orderFields(filterCombo.currentText(),
+                                                                                    fieldLayout))
+
 
     def setGunTypeTab(self):
         gunTypeLayout = QVBoxLayout()
@@ -246,7 +261,7 @@ class GUI(QApplication):
 
         # Creates a combo box
         filterCombo = QComboBox()
-        items = ['None', 'Name', 'Charge', 'Ammo %']
+        items = ['None', 'ID', 'Name', 'Ammo %']
         filterCombo.addItems(items)
         filterCombo.setMaximumWidth(150)
 
@@ -277,14 +292,24 @@ class GUI(QApplication):
         addGunTypeText = QLabel()
         addGunTypeText.setText('Please enter the required information below to add a new gun type:')
 
-        gunTypeLayout.addWidget(filterWidget)
-        gunTypeLayout.addWidget(tableWidget)
+
         gunTypeLayout.addWidget(addGunTypeText)
         gunTypeLayout.addWidget(newGunTypeWidget)
         gunTypeLayout.addWidget(fieldIDWidget)
         gunTypeLayout.addWidget(addButton)
+        gunTypeLayout.addWidget(filterWidget)
+        gunTypeLayout.addWidget(tableWidget)
 
         self.gunTypeTab.setLayout(gunTypeLayout)
+
+        # Handling events
+        QObject.connect(addButton, SIGNAL("clicked()"),
+                        lambda: buttonClicked() )
+
+        QObject.connect(filterButton, SIGNAL("clicked()"), lambda: self.orderGunTypes(filterCombo.currentText(),
+                                                                                    gunTypeLayout))
+
+
 
     def setGunTab(self):
         gunLayout = QVBoxLayout()
@@ -313,7 +338,7 @@ class GUI(QApplication):
 
         # Creates a combo box
         filterCombo = QComboBox()
-        items = ['None', 'Location', 'Name', 'Throng']
+        items = ['None', 'ID', 'Serial Number', 'Name']
         filterCombo.addItems(items)
         filterCombo.setMaximumWidth(150)
 
@@ -345,13 +370,25 @@ class GUI(QApplication):
         addGunText = QLabel()
         addGunText.setText('Please enter the required information below to add a new gun:')
 
-        gunLayout.addWidget(filterWidget)
-        gunLayout.addWidget(tableWidget)
+
         gunLayout.addWidget(addGunText)
         gunLayout.addWidget(newGunWidget)
         gunLayout.addWidget(addButton)
+        gunLayout.addWidget(filterWidget)
+        gunLayout.addWidget(tableWidget)
 
         self.gunTab.setLayout(gunLayout)
+
+        # Handling events
+        QObject.connect(addButton, SIGNAL("clicked()"),
+                        lambda: self.addGun('gun',
+                                                serialNumber.text(),
+                                                name.text(),
+                                                gunTypeID.text(),
+                                                tableWidget,
+                                                gunLayout))
+
+        QObject.connect(filterButton, SIGNAL("clicked()"), lambda: self.orderGuns(filterCombo.currentText(), gunLayout))
 
     def setShotTab(self):
         shotLayout = QVBoxLayout()
@@ -368,10 +405,11 @@ class GUI(QApplication):
         shooterSSNLayout = QHBoxLayout()
         shooterIDText = QLabel()
         shooterIDText.setText('Shooter : ')
-        shooterIDInputField = QComboBox()
-        shooterIDInputField.addItems(['1','2','3'])
+        shooterIDCombo = QComboBox()
+        shooterList = []
+        shooterIDCombo = self.__o.getCombo('shooter_combo', shooterList)
         shooterSSNLayout.addWidget(shooterIDText)
-        shooterSSNLayout.addWidget(shooterIDInputField)
+        shooterSSNLayout.addWidget(shooterIDCombo)
         shooterSSNLayout.setAlignment(Qt.AlignLeft)
         ShooterSSNWidget.setLayout(shooterSSNLayout)
 
@@ -381,8 +419,10 @@ class GUI(QApplication):
         gunIDText = QLabel()
         gunIDText.setText('Gun ID: ')
         gunIDCombo = QComboBox()
-        gunIDList = ['1', '2', '3']
-        gunIDCombo.addItems(gunIDList)
+
+        gunIDList = []
+        gunIDCombo = self.__o.getCombo('gun_Combo',gunIDList)
+        gunIDCombo.setCurrentIndex(1)
         gunIDLayout.addWidget(gunIDText)
         gunIDLayout.addWidget(gunIDCombo)
         gunIDLayout.setAlignment(Qt.AlignLeft)
@@ -394,8 +434,9 @@ class GUI(QApplication):
         fieldIDText = QLabel()
         fieldIDText.setText('Fieild ID')
         fieldIDCombo = QComboBox()
-        fieldIDList = ['4', '12', '5']
-        fieldIDCombo.addItems(fieldIDList)
+        fieldIDList = []
+        #selectedGun = [int(gunIDList[gunIDCombo.currentIndex()]),]
+        fieldIDCombo = self.__o.getCombo('field_combo',fieldIDList)
         fieldIDLayout.addWidget(fieldIDText)
         fieldIDLayout.addWidget(fieldIDCombo)
         fieldIDLayout.setAlignment(Qt.AlignLeft)
@@ -432,7 +473,7 @@ class GUI(QApplication):
 
         # Creates a combo box
         filterCombo = QComboBox()
-        items = ['None', 'Location', 'Name', 'Throng']
+        items = ['None', 'Shooter', 'Field']
         filterCombo.addItems(items)
         filterCombo.setMaximumWidth(150)
 
@@ -460,30 +501,29 @@ class GUI(QApplication):
         #Shot ekleme
         QObject.connect(addButton, SIGNAL("clicked()"), lambda: buttonClicked())
 
-
         addShotText = QLabel()
         addShotText.setText('Please enter the required information below to add a new shot:')
 
-
-        shotLayout.addWidget(filterWidget)
-        shotLayout.addWidget(tableWidget)
         shotLayout.addWidget(addShotText)
         shotLayout.addWidget(ShooterSSNWidget)
         shotLayout.addWidget(gunIDWidget)
         shotLayout.addWidget(fieldIDWidget)
         shotLayout.addWidget(newShotWidget)
         shotLayout.addWidget(addButton)
+        shotLayout.addWidget(filterWidget)
+        shotLayout.addWidget(tableWidget)
 
         self.shotTab.setLayout(shotLayout)
 
-    def setUses_fieldTab(self):
-        uses_fieldLayout = QVBoxLayout()
+        # Handling events
+        QObject.connect(addButton, SIGNAL("clicked()"),
+                        lambda: buttonClicked())
+
+        QObject.connect(filterButton,SIGNAL("clicked()"),lambda: self.filterShots(filterCombo.currentText(),
+                                                                                  shotLayout))
 
 
-    def centerWindow(self):
-        resolution = QDesktopWidget().screenGeometry()
-        self.mainWindow.move((resolution.width() / 2) - (self.mainWindow.frameSize().width() / 2),
-                             (resolution.height() / 2) - (self.mainWindow.frameSize().height() / 2))
+
 
     def addShooter(self, tableName,SSN,nameSurname,birthDate,communication,membershipCombo, tableWidget, tableLayout):
         newShooterData = []
@@ -500,12 +540,111 @@ class GUI(QApplication):
 
         try:
             self.__o.addItem(tableName, newShooterData)
-            tableLayout.itemAt(1).widget().setParent(None)
+            tableLayout.itemAt(5).widget().setParent(None)
             tableWidget = self.__o.getTable('shooter')
             tableLayout.addWidget(tableWidget)
             tableLayout.update()
         except Exception as e:
             self.showPopupMessage(e.message)
+
+
+    def addField(self, tableName, location,name,maxRange, tableWidget, tableLayout):
+        newFieldData = []
+
+        newFieldData.append(str(location))
+        newFieldData.append(str(name))
+        newFieldData.append(int(maxRange))
+
+        try:
+            self.__o.addItem(tableName, newFieldData)
+            tableLayout.itemAt(4).widget().setParent(None)
+            tableWidget = self.__o.getTable('field')
+            tableLayout.addWidget(tableWidget)
+            tableLayout.update()
+            self.showPopupMessage('Field Added')
+        except Exception as e:
+            self.showPopupMessage(e.message)
+
+
+    def addGun(self, tableName, serialNumber, name, gunTypeID, tableWidget, tableLayout):
+        newGunData = []
+
+        newGunData.append(str(serialNumber))
+        newGunData.append(str(name))
+        newGunData.append(int(gunTypeID))
+
+        try:
+            self.__o.addItem(tableName, newGunData)
+            tableLayout.itemAt(4).widget().setParent(None)
+            tableWidget = self.__o.getTable('gun')
+            tableLayout.addWidget(tableWidget)
+            tableLayout.update()
+            self.showPopupMessage('Gun Added')
+        except Exception as e:
+            self.showPopupMessage(e.message)
+
+    def orderShooters(self, orderSelection, tableLayout):
+
+        tableLayout.itemAt(5).widget().setParent(None)
+        if orderSelection == 'Success':
+            tableWidget = self.__o.getTable('shooter_ob_success')
+        elif orderSelection == 'Members':
+            tableWidget = self.__o.getTable('shooter_ob_name')
+        elif orderSelection == 'Not Members':
+            tableWidget = self.__o.getTable('shooter_not_member')
+
+        tableLayout.addWidget(tableWidget)
+        tableLayout.update()
+
+
+    def orderFields(self, orderSelection, tableLayout):
+        tableLayout.itemAt(4).widget().setParent(None)
+        if orderSelection == 'ID':
+            tableWidget = self.__o.getTable('field_ob_id')
+        elif orderSelection == 'Name':
+            tableWidget = self.__o.getTable('field_ob_name')
+        elif orderSelection == 'Throng':
+            tableWidget = self.__o.getTable('field_ob_throng')
+
+        tableLayout.addWidget(tableWidget)
+        tableLayout.update()
+
+    def orderGunTypes(self, orderSelection, tableLayout):
+        tableLayout.itemAt(5).widget().setParent(None)
+        if orderSelection == 'ID':
+            tableWidget = self.__o.getTable('gun_type_ob_id')
+        elif orderSelection == 'Name':
+            tableWidget = self.__o.getTable('gun_type_ob_name')
+        elif orderSelection == 'Ammo %':
+            tableWidget = self.__o.getTable('gun_type_ob_ammo_percentage')
+
+        tableLayout.addWidget(tableWidget)
+        tableLayout.update()
+
+    def orderGuns(self, orderSelection, tableLayout):
+        tableLayout.itemAt(4).widget().setParent(None)
+        if orderSelection == 'ID':
+            tableWidget = self.__o.getTable('gun_ob_id')
+        elif orderSelection == 'Serial Number':
+            tableWidget = self.__o.getTable('gun_ob_serial_number')
+        elif orderSelection == 'Name':
+            tableWidget = self.__o.getTable('gun_ob_name')
+
+        tableLayout.addWidget(tableWidget)
+        tableLayout.update()
+
+    def filterShots(self, filterSelection, tableLayout):
+        tableLayout.itemAt(4).widget().setParent(None)
+        if filterSelection == 'Shooter':
+            tableWidget = self.__o.getTable('gun_ob_id')
+        elif filterSelection == 'Field':
+            tableWidget = self.__o.getTable('gun_ob_serial_number')
+
+        tableLayout.addWidget(tableWidget)
+        tableLayout.update()
+        pass
+
+
 
     def showPopupMessage(self,message):
         popup = QWidget()
@@ -522,7 +661,12 @@ class GUI(QApplication):
 
         popup.show()
 
+    def centerWindow(self):
+        resolution = QDesktopWidget().screenGeometry()
+        self.mainWindow.move((resolution.width() / 2) - (self.mainWindow.frameSize().width() / 2),
+                             (resolution.height() / 2) - (self.mainWindow.frameSize().height() / 2))
+
 
 
 def buttonClicked():
-    print('Vuuhuuu!!')
+    print('Button clicked!')
