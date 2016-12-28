@@ -517,7 +517,12 @@ class GUI(QApplication):
 
         # Handling events
         QObject.connect(addButton, SIGNAL("clicked()"),
-                        lambda: buttonClicked())
+                        lambda: self.addShot('shot', shooterList[shooterIDCombo.currentIndex()],
+                                             gunIDList[gunIDCombo.currentIndex()]
+                                             , fieldIDList[fieldIDCombo.currentIndex()],
+                                             successPercentage.text(),
+                                             startDate.text(), stopDate.text(),
+                                             tableWidget , shotLayout))
 
         QObject.connect(filterButton,SIGNAL("clicked()"),lambda: self.filterShots(filterCombo.currentText(),
                                                                                   shotLayout))
@@ -582,6 +587,32 @@ class GUI(QApplication):
             self.showPopupMessage('Gun Added')
         except Exception as e:
             self.showPopupMessage(e.message)
+
+
+    def addShot(self, tableName, shooterSSN, gunId, fieldID,
+                success, startDate, stopDate, tableWidget, tableLayout):
+        newShotData = []
+
+        newShotData.append(int(shooterSSN))
+        newShotData.append(int(gunId))
+        newShotData.append(int(fieldID))
+        newShotData.append(float(success))
+        newShotData.append(str(startDate) + ':00.000000')
+        newShotData.append(str(stopDate) + ':00.000000')
+
+        try:
+            self.__o.addItem(tableName, newShotData)
+            tableLayout.itemAt(7).widget().setParent(None)
+            tableWidget = self.__o.getTable('shot')
+            tableLayout.addWidget(tableWidget)
+            tableLayout.update()
+            self.showPopupMessage('Shot Added')
+        except Exception as e:
+            self.showPopupMessage(e.message)
+
+
+
+        pass
 
     def orderShooters(self, orderSelection, tableLayout):
 

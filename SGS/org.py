@@ -18,7 +18,7 @@ class ORG:
         self._guncols = ("serial_number", "nm", "gun_type_id",)
         self._shotcols = ("shooter_ssn", "gun_id", "field_id", "success_percentage", "start_date", "stop_date",)
 
-    def getTable(self,tableName,param=None):
+    def getTable(self, tableName, param=None):
         if "shooter" in tableName:
             labels = self._shooterlabels
         elif "field" in tableName:

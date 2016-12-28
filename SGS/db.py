@@ -33,6 +33,7 @@ class DB() :
                 values.append(str(dataDict[key]))
 
         query = "insert into " + tableName + "(" + ','.join(keys) + ") values (" + ','.join(values) + ")"
+        print query
 
         conn = self.connect()
         cur = conn.cursor()
